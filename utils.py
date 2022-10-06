@@ -21,28 +21,23 @@ class AudioAnalysis(object):
     def __init__(self, audio_path='resources/R9_ZSCveAHg_7s.wav'):
         self.audio_path = audio_path
 
-    @property
+    @lazy_property
     def audio(self):
-        if not hasattr(self, '_audio'):
-            (audio, _) = librosa.core.load(self.audio_path, sr=32000, mono=True)
-            self._audio = audio[None, :]  # (batch_size, segment_samples)
-        return self._audio
+        (audio, _) = librosa.core.load(self.audio_path, sr=32000, mono=True)
+        audio = audio[None, :]  # (batch_size, segment_samples)
+        return audio
 
-    @property
+    @lazy_property
     def clipwise_output(self):
-        if not hasattr(self, '_clipwise_output'):
-            at = AudioTagging(checkpoint_path=None, device='cuda')
-            (clipwise_output, embedding) = at.inference(self.audio)
-            self._clipwise_output = clipwise_output
-        return self._clipwise_output
+        at = AudioTagging(checkpoint_path=None, device='cuda')
+        (clipwise_output, embedding) = at.inference(self.audio)
+        return clipwise_output
 
-    @property
+    @lazy_property
     def framewise_output(self):
-        if not hasattr(self, '_framewise_output'):
-            sed = SoundEventDetection(checkpoint_path=None, device='cuda')
-            framewise_output = sed.inference(self.audio)
-            self._framewise_output = framewise_output
-        return self._framewise_output
+        sed = SoundEventDetection(checkpoint_path=None, device='cuda')
+        framewise_output = sed.inference(self.audio)
+        return framewise_output
 
     def __str__(self):
         detected = {}
