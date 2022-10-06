@@ -39,13 +39,18 @@ class AudioAnalysis(object):
         framewise_output = sed.inference(self.audio)
         return framewise_output
 
-    def __str__(self):
+    @lazy_property
+    def detected(self):
         detected = {}
         for index, detection in enumerate(self.clipwise_output[0]):
             if detection > .5:
                 label_name = config.labels[index]
                 detected[label_name] = {'value': index,
                                         'detection_level': detection}
-        return pprint.pformat(detected)
+        return detected
+
+    def __str__(self):
+
+        return pprint.pformat(self.detected)
 
 
